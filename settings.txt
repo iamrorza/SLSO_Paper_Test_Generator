@@ -1,0 +1,6 @@
+Number of Multiple Choice Questions:
+10
+Number of Short Answer Questions:
+0
+Topics:
+Functions

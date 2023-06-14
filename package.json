@@ -1,0 +1,20 @@
+{
+  "name": "slso_practice_test",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/iamrorza/SLSO_Test_Paper_Generator.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/iamrorza/SLSO_Test_Paper_Generator/issues"
+  },
+  "homepage": "https://github.com/iamrorza/SLSO_Test_Paper_Generator#readme"
+}
