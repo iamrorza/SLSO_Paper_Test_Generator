@@ -141,7 +141,6 @@ function SAQuestions(saquestions, doc, numMC){
 
     position = 75
     
-    console.log(saquestions)
     
     saquestions.forEach((question) =>{
         for(var i = 0; i < parseInt(question[2]); ++i){
