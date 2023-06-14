@@ -16,5 +16,10 @@
   "bugs": {
     "url": "https://github.com/iamrorza/SLSO_Test_Paper_Generator/issues"
   },
-  "homepage": "https://github.com/iamrorza/SLSO_Test_Paper_Generator#readme"
+  "homepage": "https://github.com/iamrorza/SLSO_Test_Paper_Generator#readme",
+  "dependencies": {
+    "fs": "^0.0.1-security",
+    "image-size": "^1.0.2",
+    "pdfkit": "^0.13.0"
+  }
 }

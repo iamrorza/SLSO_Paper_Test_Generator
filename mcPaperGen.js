@@ -1,7 +1,6 @@
 const PDFDocument = require('pdfkit');
 const fs = require('fs');
 const sizeOf = require('image-size');
-const {randomInt} = require('crypto');
 
 const csvReadIn = require('./CSVReading')
 const filter = require('./filterByTopics')

@@ -7,6 +7,7 @@ const csvReadIn = require('./CSVReading')
 const filter = require('./filterByTopics')
 
 
+
 /*
     Program flow
 
@@ -24,9 +25,9 @@ module.exports = {
         mainGenerator
         Creates the PDF
     */
-    mainGenerator: async function(numMC, topics) {
+    mainGenerator: async function(numSA, topics) {
         try{
-            let doc = new PDFDocument({size: 'A4', margins: {
+            var doc = new PDFDocument({size: 'A4', margins: {
                 top: 50,
                 bottom: 50,
                 left: 120,
@@ -41,24 +42,22 @@ module.exports = {
             position += 20;
     
             let saquestions = csvReadIn.loadSADataCSV();
-            mcquestions = filter.filterByTopic(mcquestions, topics, numMC)
+            saquestions = filter.filterByTopic(saquestions, topics, numSA)
     
-            let mcAnswers = [];
-            let count = 0;
+
+            let SADir = "./Data/ShortAnswer/";
+            let count = 1;
     
-            doc.addPage()
-            doc.fontSize(25).font('Courier-Bold').text("Short Answer Solutions")
             position = 75
-            saDir = "data/A/AdvSA"
+            
+            console.log(saquestions)
+            
+            saquestions.forEach((question) =>{
+                for(var i = 0; i < parseInt(question[2]); ++i){
 
-            count = numOfMCQs + 1
-            saInfo[0].forEach((question)=>{
-                
-                for(var i = 0; i < parseInt(question[4]); ++i){
-                    let imageNum = (parseInt(question[3]) + i)
-                    let url = saDir + "/" + imageNum + ".png"
+                    let imageNum = (parseInt(question[1]) + i);
+                    let url = SADir + "Q/" + imageNum + ".png";
                     const dimensions = sizeOf(url)
-
                     let multiplier = 350/dimensions.width;
 
                     if(position + dimensions.height * multiplier + 25 > 800){
@@ -74,16 +73,41 @@ module.exports = {
                     
                     doc.moveDown()
                     position += 10;
+
+                    
                 }
+                ++count;
+            })
+            //------------------------------SHORT ANSWER SOLUTIONS
+            doc.addPage();
+            doc.fontSize(25).font('Courier-Bold').text("Short Answer Solutions")
 
-                doc.fontSize(10).text(question[1] + ', ' + question[2] + ". Keywords: " + question[0])
+            count = 1;
+            saquestions.forEach((question)=>{
+                for(var i = 0; i < parseInt(question[2]); ++i){
 
-                doc.moveTo(72, position).lineTo(522, position).stroke();
+                    let imageNum = (parseInt(question[1]) + i);
+                    let url = SADir + "A/" + imageNum + ".png";
+                    const dimensions = sizeOf(url)
+                    let multiplier = 350/dimensions.width;
 
-                doc.moveDown()
-                position += 25;
-                
-                count++
+                    if(position + dimensions.height * multiplier + 25 > 800){
+                        doc.addPage();
+                        position = 59;
+                    }
+                    if(i == 0){
+                        doc.fontSize(10).font('Courier-Bold').text("Question " + (count))
+                        position += 20
+                    }
+                    doc.image(url, {align: 'center', width:350})
+                    position += dimensions.height * multiplier;
+                    
+                    doc.moveDown()
+                    position += 10;
+
+                    
+                }
+                ++count;
             })
             
     

@@ -53,11 +53,10 @@ module.exports = {
         
         if(questionArray.length <= numOfQs)return questionArray;
 
-        let setOfQNum = setOfQuestionNumbers(questionArray.length, numOfQs);
-        
+        let setOfQNum = setOfQuestionNumbers(questionArray.length-1, numOfQs);
         let newQuestionArray = [];
         setOfQNum = Array.from(setOfQNum)
-
+        
         for(let num in setOfQNum){
             newQuestionArray.push(questionArray[setOfQNum[num]]);
         }

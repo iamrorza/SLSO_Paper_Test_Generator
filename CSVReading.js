@@ -37,8 +37,8 @@ module.exports = {
 
         TODO Potentially change the number to make it happen somewhere else
     */
-    loadSADataCSV: function (url, numOfQs){
-        let lines = fs.readFileSync(url, 'utf-8')
+    loadSADataCSV: function (){
+        let lines = fs.readFileSync("./Data/ShortAnswer/Q/SAData.csv", 'utf-8')
         let output = [];
 
         lines.split(/\r?\n/).forEach(line =>  {
@@ -46,19 +46,7 @@ module.exports = {
             output.push([this.trimQuotes(split[0]), split[1], split[2]]);
         });
 
-        let numOfAvailableQs = output.length;
-
-        let SANumbersSet = new Set();
-        while(SANumbersSet.size < numOfQs - 1){
-            SANumbersSet.add(randomInt(1,numOfAvailableQs));
-        }
-
-        let strings = []
-        SANumbersSet.forEach((e)=>{
-            strings.push(output[e]);
-        });
-
-        return strings;
+        return output;
     }
 
 }
