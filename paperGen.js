@@ -4,6 +4,7 @@ const csv = require('./CSVReading.js')
 const filter = require('./filterByTopics.js')
 const PDFDocument = require('pdfkit');
 const sizeOf = require('image-size');
+const { error } = require('console');
 
 function readInSettings(){
     let lines = fs.readFileSync('./settings.txt', 'utf-8')
@@ -100,6 +101,11 @@ function MCQuestions(mcquestions, doc){
     }
 }
 
+/*
+    MCAnswers
+    @param answers - list of answers for the multiple choice
+    @param doc - pdf doc that is being edited
+*/
 function MCAnswers(answers, doc){
     //--------------------------ANSWERS
     doc.addPage()
@@ -115,62 +121,170 @@ function MCAnswers(answers, doc){
     })
 }
 
-function SAQuestions(saquestions, doc){
+/*
+    SAQuestions
+    @param saquestions - short answer questions that are going to be put on the pdf
+    @param doc - pdf doc that is being edited
+    @param numMC - number of MC questions, so that the count is continuous
+*/
+function SAQuestions(saquestions, doc, numMC){
+    let position = 50;
+    let title = process.argv[2];
 
+
+    doc.fontSize(10).font('Courier-Bold').text(title);
+    position += 20;
+
+
+    let SADir = "./Data/ShortAnswer/";
+    let count = 1 + numMC;
+
+    position = 75
+    
+    console.log(saquestions)
+    
+    saquestions.forEach((question) =>{
+        for(var i = 0; i < parseInt(question[2]); ++i){
+
+            let imageNum = (parseInt(question[1]) + i);
+            let url = SADir + "Q/" + imageNum + ".png";
+            const dimensions = sizeOf(url)
+            let multiplier = 350/dimensions.width;
+
+            if(position + dimensions.height * multiplier + 25 > 800){
+                doc.addPage();
+                position = 59;
+            }
+            if(i == 0){
+                doc.fontSize(10).font('Courier-Bold').text("Question " + (count))
+                position += 20
+            }
+            doc.image(url, {align: 'center', width:350})
+            position += dimensions.height * multiplier;
+            
+            doc.moveDown()
+            position += 10;
+
+            
+        }
+        ++count;
+    })
 }
 
-function SAAnswers(saquestions, doc){
-    
+/*
+    SAAnswers
+    @param saquestions - short answer answers that are going to be put on the pdf
+    @param doc - pdf doc that is being edited
+    @param numMC - number of MC questions, so that the count is continuous
+*/
+function SAAnswers(saquestions, doc, numMC){
+    doc.addPage();
+    doc.fontSize(25).font('Courier-Bold').text("Short Answer Solutions")
+
+    let SADir = "./Data/ShortAnswer/";
+
+    count = 1 + numMC;
+    saquestions.forEach((question)=>{
+        for(var i = 0; i < parseInt(question[2]); ++i){
+
+            let imageNum = (parseInt(question[1]) + i);
+            let url = SADir + "A/" + imageNum + ".png";
+            const dimensions = sizeOf(url)
+            let multiplier = 350/dimensions.width;
+
+            if(position + dimensions.height * multiplier + 25 > 800){
+                doc.addPage();
+                position = 59;
+            }
+            if(i == 0){
+                doc.fontSize(10).font('Courier-Bold').text("Question " + (count))
+                position += 20
+            }
+            doc.image(url, {align: 'center', width:350})
+            position += dimensions.height * multiplier;
+            
+            doc.moveDown()
+            position += 10;
+
+            
+        }
+        ++count;
+    })
 }
 
 function paperGen(settings){
     
-    let MC = settings[0] > 0;
-    let SA = settings[1] > 0;
+    try{
+        let MC = settings[0] > 0;
+        let SA = settings[1] > 0;
 
-    let mcanswers;
-    if(!MC && !SA)return;
-    else{
-        var doc = new PDFDocument({size: 'A4', margins: {
-            top: 50,
-            bottom: 50,
-            left: 120,
-            right: 72
-        }});
-        doc.fontSize(10).font('Courier-Bold').text(process.argv[2]);
+        let mcanswers;
+        if(!MC && !SA)return;
+        else{
+            var doc = new PDFDocument({size: 'A4', margins: {
+                top: 50,
+                bottom: 50,
+                left: 120,
+                right: 72
+            }});
+            doc.fontSize(10).font('Courier-Bold').text(process.argv[2]);
+        }
+
+        let mcquestions;
+        if(MC){
+            mcquestions = csv.loadMCDataCSV();
+            mcquestions = filter.filterByTopic(mcquestions, settings[2], settings[0]);
+        }
+
+        let saquestions;
+        if(SA){
+            saquestions = csv.loadSADataCSV();
+            saquestions = filter.filterByTopic(saquestions, settings[2], settings[1]);
+        }
+
+        if(MC){
+            mcanswers = MCQuestions(mcquestions, doc);
+        }
+
+        if(SA){
+            if(MC)doc.addPage();
+
+            SAQuestions(saquestions, doc, settings[0]);
+        }
+
+        if(MC){
+            MCAnswers(mcanswers, doc);
+        }
+
+        if(SA){
+            SAAnswers(saquestions, doc, settings[0]);
+        }
+        
+        doc.end();
     }
-
-    if(MC){
-        let mcquestions = csv.loadMCDataCSV();
-        mcquestions = filter.filterByTopic(mcquestions, settings[2], settings[0]);
-        mcanswers = MCQuestions(mcquestions, doc);
-    }
-
-    if(SA){
-        if(MC)doc.addPage();
-
-        let saquestions = getquestions
-        SAQuestions(saquestions, doc)
-    }
-
-    if(MC){
-        MCAnswers(mcanswers, doc);
-    }
-
-    if(SA){
-        SAAnswers
+    catch(err){
+        console.log(err);
+        throw error;
     }
     
-    doc.end();
 }
 
 function main(){
-    let settings = readInSettings();  
-    let finished = true;
+    let settings;
+    try{
+        settings = readInSettings(); 
+    }
+    catch(err){
+        console.log("Settings could not be read");
+    }
+     
     
-    paperGen(settings)
-    if(finished)console.log("Paper \"" + process.argv[2] + "\" Created");
-    else console.log("Paper could not be created");
+    try{
+        paperGen(settings);
+    }
+    catch(err){
+        console.log("Paper could not be created");
+    }
 
 }
 
