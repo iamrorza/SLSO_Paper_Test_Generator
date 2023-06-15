@@ -35,7 +35,6 @@ module.exports = {
         @param numOfQs - number of short answer questions
         @return array/list of questions in the format [str: topics, int: questionNumber, int: how many subquestions/images are there in this question]
 
-        TODO Potentially change the number to make it happen somewhere else
     */
     loadSADataCSV: function (){
         let lines = fs.readFileSync("./Data/ShortAnswer/Q/SAData.csv", 'utf-8')

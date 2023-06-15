@@ -18,6 +18,8 @@
   },
   "homepage": "https://github.com/iamrorza/SLSO_Test_Paper_Generator#readme",
   "dependencies": {
+    "ansi-colors": "^4.1.3",
+    "cli-progress": "^3.12.0",
     "fs": "^0.0.1-security",
     "image-size": "^1.0.2",
     "pdfkit": "^0.13.0"

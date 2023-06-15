@@ -29,7 +29,9 @@ Each line should be a respective question and should be formatted: "TOPICS", IMA
 ### Settings.txt file
 
 Line 2 is the amount of multiple choice questions.
+
 Line 4 is the amount of short answer questions.
+
 Lines 6+ should be any topics that want to be included in the PDF.
 
 ## HOW TO USE

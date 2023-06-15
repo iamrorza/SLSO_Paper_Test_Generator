@@ -6,6 +6,10 @@ const PDFDocument = require('pdfkit');
 const sizeOf = require('image-size');
 const { error } = require('console');
 
+const cliProgress = require('cli-progress');
+const colors = require('ansi-colors');
+
+
 function readInSettings(){
     let lines = fs.readFileSync('./settings.txt', 'utf-8')
     let count = 0;
@@ -211,6 +215,11 @@ function SAAnswers(saquestions, doc, numMC){
     })
 }
 
+/*
+    paperGen
+    Calls the MC and SA functions to put the questions and answers on the pdf
+    @param settings - the settings for the test [numMC, numSA, topics]
+*/
 function paperGen(settings){
     
     try{
@@ -219,47 +228,64 @@ function paperGen(settings){
 
         let mcanswers;
         if(!MC && !SA)return;
-        else{
-            var doc = new PDFDocument({size: 'A4', margins: {
-                top: 50,
-                bottom: 50,
-                left: 120,
-                right: 72
-            }});
-            doc.fontSize(10).font('Courier-Bold').text(process.argv[2]);
-        }
+        
+        var doc = new PDFDocument({size: 'A4', margins: {
+            top: 50,
+            bottom: 50,
+            left: 120,
+            right: 72
+        }});
+        doc.fontSize(10).font('Courier-Bold').text(process.argv[2]);
+        
+        const progressBar = new cliProgress.SingleBar({
+            format: 'Generating Test |' + colors.magenta('{bar}') + '| {percentage}%',
+            barCompleteChar: '\u2588',
+            barIncompleteChar: '\u2591',
+            hideCursor: true
+        });
+
+        progressBar.start(100, 0, {
+            speed: "N/A"
+        });
+        
 
         let mcquestions;
         if(MC){
             mcquestions = csv.loadMCDataCSV();
             mcquestions = filter.filterByTopic(mcquestions, settings[2], settings[0]);
         }
-
+        
         let saquestions;
         if(SA){
             saquestions = csv.loadSADataCSV();
             saquestions = filter.filterByTopic(saquestions, settings[2], settings[1]);
         }
-
+        progressBar.increment();
+        progressBar.update(15);
         if(MC){
             mcanswers = MCQuestions(mcquestions, doc);
         }
-
+        progressBar.increment();
+        progressBar.update(25);
         if(SA){
             if(MC)doc.addPage();
 
             SAQuestions(saquestions, doc, settings[0]);
         }
-
+        progressBar.increment();
+        progressBar.update(50);
         if(MC){
             MCAnswers(mcanswers, doc);
         }
-
+        progressBar.increment();
+        progressBar.update(75);
         if(SA){
             SAAnswers(saquestions, doc, settings[0]);
         }
-        
+        progressBar.increment();
+        progressBar.update(100);
         doc.end();
+        progressBar.stop();
     }
     catch(err){
         console.log(err);
